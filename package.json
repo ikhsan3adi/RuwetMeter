@@ -1,0 +1,12 @@
+{
+  "name": "ruwetmeter",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.9.0"
+  }
+}

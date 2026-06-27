@@ -1,11 +1,11 @@
-import { eq, inArray, sql } from "drizzle-orm";
-import type { Article } from "../../../domain/entities/article";
+import { eq, inArray, sql } from 'drizzle-orm'
+import type { Article } from '../../../domain/entities/article'
 import type {
   ArticleRepositoryPort,
   ArticleWithScore,
-} from "../../../application/ports/article-repository.port";
-import { db } from "../client";
-import { newsArticles } from "../schema";
+} from '../../../application/ports/article-repository.port'
+import { db } from '../client'
+import { newsArticles } from '../schema'
 
 function rowToArticle(row: typeof newsArticles.$inferSelect): Article {
   return {
@@ -17,7 +17,7 @@ function rowToArticle(row: typeof newsArticles.$inferSelect): Article {
     contentType: row.contentType,
     publishedAt: row.publishedAt,
     fetchedAt: row.fetchedAt,
-  };
+  }
 }
 
 export class ArticleRepository implements ArticleRepositoryPort {
@@ -25,19 +25,17 @@ export class ArticleRepository implements ArticleRepositoryPort {
     embeddings: Array<{ articleId: string; embedding: number[] }>,
   ): Promise<void> {
     for (const { articleId, embedding } of embeddings) {
-      const vectorStr = `[${embedding.join(",")}]`;
+      const vectorStr = `[${embedding.join(',')}]`
       await db.execute(sql`
         UPDATE news_articles
         SET embedding = ${vectorStr}::vector(${sql.raw(String(embedding.length))})
         WHERE id = ${articleId}
-      `);
+      `)
     }
   }
 
-  async upsertBatch(
-    articles: Omit<Article, "id">[],
-  ): Promise<Article[]> {
-    const urls = articles.map((a) => a.url);
+  async upsertBatch(articles: Omit<Article, 'id'>[]): Promise<Article[]> {
+    const urls = articles.map((a) => a.url)
 
     await db
       .insert(newsArticles)
@@ -52,14 +50,11 @@ export class ArticleRepository implements ArticleRepositoryPort {
           fetchedAt: a.fetchedAt,
         })),
       )
-      .onConflictDoNothing({ target: newsArticles.url });
+      .onConflictDoNothing({ target: newsArticles.url })
 
-    const rows = await db
-      .select()
-      .from(newsArticles)
-      .where(inArray(newsArticles.url, urls));
+    const rows = await db.select().from(newsArticles).where(inArray(newsArticles.url, urls))
 
-    return rows.map(rowToArticle);
+    return rows.map(rowToArticle)
   }
 
   async findRecentWithEmbedding(limit: number): Promise<Article[]> {
@@ -68,9 +63,9 @@ export class ArticleRepository implements ArticleRepositoryPort {
       .from(newsArticles)
       .where(sql`embedding IS NOT NULL`)
       .orderBy(sql`published_at DESC`)
-      .limit(limit);
+      .limit(limit)
 
-    return rows.map(rowToArticle);
+    return rows.map(rowToArticle)
   }
 
   async semanticSearch(
@@ -78,9 +73,9 @@ export class ArticleRepository implements ArticleRepositoryPort {
     limit: number,
     decayHalfLifeDays: number = 1,
   ): Promise<ArticleWithScore[]> {
-    const vectorStr = `[${queryEmbedding.join(",")}]`;
-    const halfLifeSecs = decayHalfLifeDays * 86400;
-    const embeddingDim = queryEmbedding.length;
+    const vectorStr = `[${queryEmbedding.join(',')}]`
+    const halfLifeSecs = decayHalfLifeDays * 86400
+    const embeddingDim = queryEmbedding.length
 
     const { rows } = await db.execute(sql`
       SELECT
@@ -92,7 +87,7 @@ export class ArticleRepository implements ArticleRepositoryPort {
       WHERE embedding IS NOT NULL
       ORDER BY final_score DESC
       LIMIT ${limit}
-    `);
+    `)
 
     return (rows as Array<Record<string, unknown>>).map((row: any) => ({
       id: row.id as string,
@@ -100,10 +95,10 @@ export class ArticleRepository implements ArticleRepositoryPort {
       url: row.url as string,
       source: row.source as string,
       content: row.content as string,
-      contentType: row.content_type as Article["contentType"],
+      contentType: row.content_type as Article['contentType'],
       publishedAt: new Date(row.published_at as string),
       fetchedAt: new Date(row.fetched_at as string),
       finalScore: Number(row.final_score),
-    }));
+    }))
   }
 }

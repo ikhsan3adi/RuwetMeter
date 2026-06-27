@@ -1,10 +1,10 @@
-import type { ArticleRepositoryPort } from "../ports/article-repository.port";
-import type { EmbeddingProviderPort } from "../ports/embedding-provider.port";
-import type { ChatProviderPort } from "../ports/chat-provider.port";
+import type { ArticleRepositoryPort } from '../ports/article-repository.port'
+import type { EmbeddingProviderPort } from '../ports/embedding-provider.port'
+import type { ChatProviderPort } from '../ports/chat-provider.port'
 
 export interface ChatAnswer {
-  reply: string;
-  sources: string[];
+  reply: string
+  sources: string[]
 }
 
 export class GetChatAnswerUseCase {
@@ -15,22 +15,19 @@ export class GetChatAnswerUseCase {
   ) {}
 
   async execute(question: string): Promise<ChatAnswer> {
-    const queryEmbedding = await this.embeddingProvider.embed(question);
+    const queryEmbedding = await this.embeddingProvider.embed(question)
 
-    const relevantArticles = await this.articleRepo.semanticSearch(
-      queryEmbedding,
-      5,
-    );
+    const relevantArticles = await this.articleRepo.semanticSearch(queryEmbedding, 5)
 
     const context = relevantArticles
       .map((a) => `[${a.title}] (${a.url})\n${a.content}`)
-      .join("\n---\n");
+      .join('\n---\n')
 
-    const response = await this.chatProvider.respond(context, question);
+    const response = await this.chatProvider.respond(context, question)
 
     return {
       reply: response.reply,
       sources: relevantArticles.map((a) => a.url),
-    };
+    }
   }
 }

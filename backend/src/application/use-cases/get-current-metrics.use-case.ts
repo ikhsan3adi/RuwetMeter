@@ -1,23 +1,23 @@
-import type { RuwetLogRepositoryPort } from "../ports/ruwet-log-repository.port";
+import type { RuwetLogRepositoryPort } from '../ports/ruwet-log-repository.port'
 
 export interface CurrentMetricsResult {
-  timestamp: string;
+  timestamp: string
   scores: {
-    economy: number;
-    politics: number;
-    infrastructure: number;
-    social: number;
-  };
-  total: number;
-  summary: string;
+    economy: number
+    politics: number
+    infrastructure: number
+    social: number
+  }
+  total: number
+  summary: string
 }
 
 export class GetCurrentMetricsUseCase {
   constructor(private ruwetLogRepo: RuwetLogRepositoryPort) {}
 
   async execute(): Promise<CurrentMetricsResult | null> {
-    const latest = await this.ruwetLogRepo.getLatest();
-    if (!latest) return null;
+    const latest = await this.ruwetLogRepo.getLatest()
+    if (!latest) return null
 
     return {
       timestamp: latest.createdAt.toISOString(),
@@ -29,6 +29,6 @@ export class GetCurrentMetricsUseCase {
       },
       total: latest.totalScore,
       summary: latest.aiSummary,
-    };
+    }
   }
 }

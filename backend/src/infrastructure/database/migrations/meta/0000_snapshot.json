@@ -90,9 +90,7 @@
         "news_articles_url_unique": {
           "name": "news_articles_url_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "url"
-          ]
+          "columns": ["url"]
         }
       },
       "policies": {},
@@ -122,12 +120,8 @@
           "name": "ruwet_log_articles_log_id_ruwet_logs_id_fk",
           "tableFrom": "ruwet_log_articles",
           "tableTo": "ruwet_logs",
-          "columnsFrom": [
-            "log_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["log_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -135,12 +129,8 @@
           "name": "ruwet_log_articles_article_id_news_articles_id_fk",
           "tableFrom": "ruwet_log_articles",
           "tableTo": "news_articles",
-          "columnsFrom": [
-            "article_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["article_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -148,10 +138,7 @@
       "compositePrimaryKeys": {
         "ruwet_log_articles_log_id_article_id_pk": {
           "name": "ruwet_log_articles_log_id_article_id_pk",
-          "columns": [
-            "log_id",
-            "article_id"
-          ]
+          "columns": ["log_id", "article_id"]
         }
       },
       "uniqueConstraints": {},
@@ -250,11 +237,7 @@
     "public.content_type": {
       "name": "content_type",
       "schema": "public",
-      "values": [
-        "raw",
-        "cleaned",
-        "summary"
-      ]
+      "values": ["raw", "cleaned", "summary"]
     }
   },
   "schemas": {},

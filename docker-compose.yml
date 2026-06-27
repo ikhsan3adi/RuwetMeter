@@ -6,12 +6,12 @@ services:
       POSTGRES_USER: ruwet
       POSTGRES_PASSWORD: secret
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./backend/db/init.sql:/docker-entrypoint-initdb.d/01-init-vector.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ruwet -d ruwetmeter"]
+      test: ['CMD-SHELL', 'pg_isready -U ruwet -d ruwetmeter']
       interval: 5s
       timeout: 5s
       retries: 5

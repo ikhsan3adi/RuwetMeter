@@ -9,19 +9,19 @@ RuwetMeter is an autonomous socio-political stability monitoring system for Indo
 ```mermaid
 flowchart LR
     Client[Frontend SPA / Telegram Bot] -->|HTTP / Webhook| API[Hono HTTP Routes]
-    
+
     subgraph Backend [Backend]
         API --> UC[Use Cases]
         Cron[Cron Job] -->|Triggers| UC
-        
+
         subgraph AppLayer [Application Layer]
             UC --> Ports[Port Interfaces]
         end
-        
+
         subgraph DomLayer [Domain Layer]
             AppLayer --> Entities[Entities & Value Objects]
         end
-        
+
         subgraph InfraLayer [Infrastructure Layer]
             Adapters[LLM Adapters] -. Implements .-> Ports
             Repos[Repositories] -. Implements .-> Ports
@@ -49,6 +49,7 @@ flowchart LR
 ## Key Features
 
 ### Automatic Aggregation
+
 - RSS/Atom feeds parsed from **8 major Indonesian news portals**
 - Full article extraction via Mozilla Readability
 - Scheduled every **3 hours** with PostgreSQL advisory lock (no overlaps)
@@ -56,24 +57,28 @@ flowchart LR
 - LLM analysis across 4 dimensions -> scored 0-100
 
 ### Visual Dashboard
+
 - Real-time "Ruwet Level" score display with color coding
 - 4 dimension bar charts (Economy, Politics, Infrastructure, Social)
 - Historical trend line chart (3/7/14/30 day selectors)
 - Automated anomaly flagging (delta > 30 from previous cycle)
 
 ### RAG Chatbot
+
 - Time-weighted semantic search (24h half-life decay)
 - Cosine similarity * exponential decay in SQL
 - Single-turn Q&A based on latest news context
 - Rate-limited (10 req/min per IP)
 
 ### Multi-LLM Architecture
+
 - **7 providers:** Anthropic, OpenAI, Google, OpenRouter, DeepSeek, Mistral, Groq + **OpenCode Zen**
 - **Strategy Pattern** - swap providers at runtime via env vars
 - OpenAI-compatible adapter for custom endpoints
 - Embedding via OpenRouter (OpenAI `text-embedding-3-small` compatible)
 
 ### Infrastructure
+
 - Telegram webhook with `X-Telegram-Bot-Api-Secret-Token` validation
 - In-memory rate limiter (Map-based)
 - Docker Compose for pgvector with auto-init SQL
@@ -82,34 +87,40 @@ flowchart LR
 ## Quick Start
 
 ### Prerequisites
+
 - [Bun](https://bun.sh) 1.3+
 - [Docker](https://docker.com) + Docker Compose
 - An LLM API key (OpenRouter, OpenCode Zen, or any supported provider)
 
 ### 1. Start Database
+
 ```bash
 cd backend
 bun run db:up
 ```
 
 ### 2. Configure Environment
+
 ```bash
 cp .env.example .env
 # Edit .env - set API keys and provider preferences
 ```
 
 ### 3. Run Migrations
+
 ```bash
 bun run db:migrate
 ```
 
 ### 4. Start Backend
+
 ```bash
 bun run dev
 # API at http://localhost:3000/api/v1
 ```
 
 ### 5. Start Frontend
+
 ```bash
 cd ../frontend
 bun install
@@ -118,6 +129,7 @@ bun run dev
 ```
 
 ### 6. Run Aggregation Manually
+
 ```bash
 cd backend
 bun run scripts/run-aggregation.ts
