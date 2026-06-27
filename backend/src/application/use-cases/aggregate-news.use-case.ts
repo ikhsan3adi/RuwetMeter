@@ -1,9 +1,9 @@
-import type { RssFetcherPort } from '../ports/rss-fetcher.port'
+import { ScoreDimension } from '../../domain/value-objects/score-dimension'
+import type { AnalysisProviderPort } from '../ports/analysis-provider.port'
 import type { ArticleRepositoryPort } from '../ports/article-repository.port'
 import type { EmbeddingProviderPort } from '../ports/embedding-provider.port'
-import type { AnalysisProviderPort } from '../ports/analysis-provider.port'
+import type { RssFetcherPort } from '../ports/rss-fetcher.port'
 import type { RuwetLogRepositoryPort } from '../ports/ruwet-log-repository.port'
-import { ScoreDimension } from '../../domain/value-objects/score-dimension'
 
 export class AggregateNewsUseCase {
   constructor(
@@ -53,13 +53,37 @@ export class AggregateNewsUseCase {
 
     const result = await this.analysisProvider.analyze(articles)
 
-    const lastLog = await this.ruwetLogRepo.getLatest()
-    const totalScore = Math.round(
-      (result.economy + result.politics + result.infrastructure + result.social) / 4,
-    )
-    const flagged = lastLog ? Math.abs(totalScore - lastLog.totalScore) > 30 : false
-
     const clamp = (v: number) => Math.max(0, Math.min(100, Math.round(v)))
+
+    if (result.articleScores && result.articleScores.length > 0) {
+      const scoresToUpdate = result.articleScores
+        .map((score) => {
+          const article = articles.find((a) => a.url === score.url)
+          return {
+            articleId: article?.id ?? '',
+            economy: clamp(score.economy),
+            politics: clamp(score.politics),
+            infrastructure: clamp(score.infrastructure),
+            social: clamp(score.social),
+          }
+        })
+        .filter((s) => s.articleId !== '')
+
+      if (scoresToUpdate.length > 0) {
+        await this.articleRepo.updateScores(scoresToUpdate)
+      }
+    }
+
+    const lastLog = await this.ruwetLogRepo.getLatest()
+
+    // Root Mean Square (RMS)
+    const sumOfSquares =
+      Math.pow(result.economy, 2) +
+      Math.pow(result.politics, 2) +
+      Math.pow(result.infrastructure, 2) +
+      Math.pow(result.social, 2)
+    const totalScore = Math.round(Math.sqrt(sumOfSquares / 4))
+    const flagged = lastLog ? Math.abs(totalScore - lastLog.totalScore) > 30 : false
 
     await this.ruwetLogRepo.save({
       createdAt: new Date(),

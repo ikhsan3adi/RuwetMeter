@@ -6,6 +6,7 @@ import type { ChatProviderPort, ChatResult } from '../../../application/ports/ch
 import type { EmbeddingProviderPort } from '../../../application/ports/embedding-provider.port'
 import type { Article } from '../../../domain/entities/article'
 import { config } from '../../../config'
+import { ANALYSIS_SYSTEM_PROMPT, CHAT_SYSTEM_PROMPT, formatArticlesForAnalysis } from '../prompts'
 
 interface GoogleContentResponse {
   candidates: Array<{
@@ -30,10 +31,7 @@ export class GoogleAnalysisAdapter implements AnalysisProviderPort {
   }
 
   async analyze(articles: Article[]): Promise<AnalysisResult> {
-    const content = articles
-      .slice(0, 20)
-      .map((a) => `[${a.source}] ${a.title}\n${a.content.slice(0, 2000)}`)
-      .join('\n\n---\n\n')
+    const content = formatArticlesForAnalysis(articles)
 
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`
 
@@ -46,15 +44,7 @@ export class GoogleAnalysisAdapter implements AnalysisProviderPort {
             role: 'user',
             parts: [
               {
-                text:
-                  'You are a social-political analyst for Indonesia. Analyze the following news articles and return a JSON object with:\n' +
-                  '- economy: integer 0-100\n' +
-                  '- politics: integer 0-100\n' +
-                  '- infrastructure: integer 0-100\n' +
-                  '- social: integer 0-100\n' +
-                  '- summary: string (2-3 sentences in Indonesian describing the overall situation)\n\n' +
-                  'Higher score means more concerning/turbulent. Return ONLY valid JSON.\n\n' +
-                  content,
+                text: ANALYSIS_SYSTEM_PROMPT + '\n\n' + content,
               },
             ],
           },
@@ -70,13 +60,14 @@ export class GoogleAnalysisAdapter implements AnalysisProviderPort {
 
     const data = (await res.json()) as GoogleContentResponse
     const text = data.candidates[0].content.parts[0].text
-    const parsed = JSON.parse(text) as Record<string, unknown>
+    const parsed = JSON.parse(text) as any
     return {
-      economy: (parsed.economy as number) ?? 0,
-      politics: (parsed.politics as number) ?? 0,
-      infrastructure: (parsed.infrastructure as number) ?? 0,
-      social: (parsed.social as number) ?? 0,
-      summary: (parsed.summary as string) ?? '',
+      economy: parsed.economy ?? 0,
+      politics: parsed.politics ?? 0,
+      infrastructure: parsed.infrastructure ?? 0,
+      social: parsed.social ?? 0,
+      summary: parsed.summary ?? '',
+      articleScores: Array.isArray(parsed.articleScores) ? parsed.articleScores : [],
     }
   }
 }
@@ -103,9 +94,7 @@ export class GoogleChatAdapter implements ChatProviderPort {
             role: 'user',
             parts: [
               {
-                text:
-                  'You are a helpful assistant for RuwetMeter, an Indonesian public sentiment analysis system. ' +
-                  `Answer questions based on the provided news context.\n\nContext:\n${context}\n\nQuestion: ${question}`,
+                text: CHAT_SYSTEM_PROMPT + `\n\nContext:\n${context}\n\nQuestion: ${question}`,
               },
             ],
           },

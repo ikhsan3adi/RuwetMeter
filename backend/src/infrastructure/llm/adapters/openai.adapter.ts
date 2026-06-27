@@ -6,6 +6,7 @@ import type { ChatProviderPort, ChatResult } from '../../../application/ports/ch
 import type { EmbeddingProviderPort } from '../../../application/ports/embedding-provider.port'
 import type { Article } from '../../../domain/entities/article'
 import { config } from '../../../config'
+import { ANALYSIS_SYSTEM_PROMPT, CHAT_SYSTEM_PROMPT, formatArticlesForAnalysis } from '../prompts'
 
 interface ChatCompletionMessage {
   role: 'system' | 'user' | 'assistant'
@@ -51,24 +52,14 @@ export class OpenAIAnalysisAdapter implements AnalysisProviderPort {
   }
 
   async analyze(articles: Article[]): Promise<AnalysisResult> {
-    const content = articles
-      .slice(0, 20)
-      .map((a) => `[${a.source}] ${a.title}\n${a.content.slice(0, 2000)}`)
-      .join('\n\n---\n\n')
+    const content = formatArticlesForAnalysis(articles)
 
     const body: ChatCompletionRequest = {
       model: this.model,
       messages: [
         {
           role: 'system',
-          content:
-            'You are a social-political analyst for Indonesia. Analyze the following news articles and return a JSON object with:\n' +
-            '- economy: integer 0-100\n' +
-            '- politics: integer 0-100\n' +
-            '- infrastructure: integer 0-100\n' +
-            '- social: integer 0-100\n' +
-            '- summary: string (2-3 sentences in Indonesian describing the overall situation)\n\n' +
-            'Higher score means more concerning/turbulent.',
+          content: ANALYSIS_SYSTEM_PROMPT,
         },
         { role: 'user', content },
       ],
@@ -90,13 +81,14 @@ export class OpenAIAnalysisAdapter implements AnalysisProviderPort {
     }
 
     const data = (await res.json()) as ChatCompletionResponse
-    const parsed = JSON.parse(data.choices[0].message.content) as Record<string, unknown>
+    const parsed = JSON.parse(data.choices[0].message.content) as any
     return {
-      economy: (parsed.economy as number) ?? 0,
-      politics: (parsed.politics as number) ?? 0,
-      infrastructure: (parsed.infrastructure as number) ?? 0,
-      social: (parsed.social as number) ?? 0,
-      summary: (parsed.summary as string) ?? '',
+      economy: parsed.economy ?? 0,
+      politics: parsed.politics ?? 0,
+      infrastructure: parsed.infrastructure ?? 0,
+      social: parsed.social ?? 0,
+      summary: parsed.summary ?? '',
+      articleScores: Array.isArray(parsed.articleScores) ? parsed.articleScores : [],
     }
   }
 }
@@ -119,10 +111,7 @@ export class OpenAIChatAdapter implements ChatProviderPort {
       messages: [
         {
           role: 'system',
-          content:
-            'You are a helpful assistant for RuwetMeter, an Indonesian public sentiment analysis system. ' +
-            'Answer questions based on the provided news context. Be concise and factual. ' +
-            'If the answer cannot be derived from the context, say so.',
+          content: CHAT_SYSTEM_PROMPT,
         },
         {
           role: 'user',

@@ -7,4 +7,8 @@ export interface Article {
   contentType: 'raw' | 'cleaned' | 'summary'
   publishedAt: Date
   fetchedAt: Date
+  scoreEconomy?: number
+  scorePolitics?: number
+  scoreInfrastructure?: number
+  scoreSocial?: number
 }

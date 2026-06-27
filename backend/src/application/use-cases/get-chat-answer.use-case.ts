@@ -14,10 +14,15 @@ export class GetChatAnswerUseCase {
     private chatProvider: ChatProviderPort,
   ) {}
 
-  async execute(question: string): Promise<ChatAnswer> {
+  async execute(
+    question: string,
+    dimensionFilter?: 'economy' | 'politics' | 'infrastructure' | 'social',
+  ): Promise<ChatAnswer> {
     const queryEmbedding = await this.embeddingProvider.embed(question)
 
-    const relevantArticles = await this.articleRepo.semanticSearch(queryEmbedding, 5)
+    const relevantArticles = await this.articleRepo.semanticSearch(queryEmbedding, 5, {
+      dimensionFilter,
+    })
 
     const context = relevantArticles
       .map((a) => `[${a.title}] (${a.url})\n${a.content}`)

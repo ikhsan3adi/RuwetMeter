@@ -6,6 +6,13 @@ export interface AnalysisResult {
   infrastructure: number
   social: number
   summary: string
+  articleScores?: Array<{
+    url: string
+    economy: number
+    politics: number
+    infrastructure: number
+    social: number
+  }>
 }
 
 export interface AnalysisProviderPort {

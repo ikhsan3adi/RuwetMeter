@@ -9,6 +9,18 @@ export interface ArticleRepositoryPort {
   semanticSearch(
     queryEmbedding: number[],
     limit: number,
-    decayHalfLifeDays?: number,
+    options?: {
+      decayHalfLifeDays?: number
+      dimensionFilter?: 'economy' | 'politics' | 'infrastructure' | 'social'
+    },
   ): Promise<ArticleWithScore[]>
+  updateScores(
+    scores: Array<{
+      articleId: string
+      economy: number
+      politics: number
+      infrastructure: number
+      social: number
+    }>,
+  ): Promise<void>
 }

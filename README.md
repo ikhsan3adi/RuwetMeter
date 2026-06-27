@@ -66,10 +66,33 @@ flowchart LR
 
 ### RAG Chatbot
 
-- Time-weighted semantic search (24h half-life decay)
-- Cosine similarity * exponential decay in SQL
-- Single-turn Q&A based on latest news context
+- Time-weighted semantic search with per-dimension dynamic half-life decay
+- Hybrid score calculated directly in SQL using cosine similarity multiplied by exponential time decay
+- Single-turn Q&A based on dynamically weighted context
 - Rate-limited (10 req/min per IP)
+
+#### Semantic Search Score Equation
+
+The final relevance score $S_{final}$ for RAG context extraction is computed as:
+
+$$
+S_{final} = \text{CosineSimilarity} \times 2^{-\frac{\Delta t}{\tau}}
+$$
+
+Where:
+
+- $\Delta t$ is the age of the article: $\text{NOW} - \text{published\_at}$ (in seconds).
+- $\tau$ is the dynamic half-life decay parameter (in seconds) defined as:
+
+$$
+\tau = \begin{cases}
+259,200 \text{ s } (3 \text{ days}) & \text{if } \text{dimension} = \text{politics} \text{ and } \text{score\_politics} > 50 \\
+172,800 \text{ s } (2 \text{ days}) & \text{if } \text{dimension} \in \{\text{economy}, \text{infrastructure}, \text{social}\} \text{ and } \text{score\_dimension} > 50 \\
+86,400 \text{ s } (1 \text{ day}) & \text{otherwise (default)}
+\end{cases}
+$$
+
+This prevents critical socio-political events from expiring too quickly from the chatbot context pool.
 
 ### Multi-LLM Architecture
 
@@ -182,7 +205,22 @@ Each dimension scored 0-100 (higher = more turbulent/concerning):
 | **Infrastructure** | 0-100 | Power outages, transportation failures, public service disruptions  |
 | **Social**         | 0-100 | Crime spikes, natural disasters, security incidents, mass accidents |
 
-**Total Score** = average of 4 dimensions. **Flagged** if delta > 30 from previous cycle.
+#### Total Score Equation (Root Mean Square)
+
+To prevent **score dilution** (where a single critical crisis is washed out by other stable dimensions), RuwetMeter uses **Root Mean Square (RMS)** instead of a simple average for calculating the national index score:
+
+$$
+\text{TotalScore} = \sqrt{\frac{E^2 + P^2 + I^2 + S^2}{4}}
+$$
+
+Where:
+
+- $E$ = Economy score
+- $P$ = Politics score
+- $I$ = Infrastructure score
+- $S$ = Social score
+
+**Flagged** if delta > 30 from previous cycle.
 
 ## Database
 

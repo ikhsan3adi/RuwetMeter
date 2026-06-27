@@ -41,6 +41,7 @@ describe('AggregateNewsUseCase', () => {
       updateEmbeddings: mock(() => Promise.resolve()),
       findRecentWithEmbedding: mock(() => Promise.resolve([])),
       semanticSearch: mock(() => Promise.resolve([])),
+      updateScores: mock(() => Promise.resolve()),
     }
 
     const embeddingProvider: EmbeddingProviderPort = {
@@ -108,6 +109,7 @@ describe('AggregateNewsUseCase', () => {
       updateEmbeddings: mock(() => Promise.resolve()),
       findRecentWithEmbedding: mock(() => Promise.resolve([])),
       semanticSearch: mock(() => Promise.resolve([])),
+      updateScores: mock(() => Promise.resolve()),
     }
 
     const embeddingProvider: EmbeddingProviderPort = {

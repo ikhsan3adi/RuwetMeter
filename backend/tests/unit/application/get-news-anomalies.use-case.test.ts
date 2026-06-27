@@ -31,6 +31,7 @@ describe('GetNewsAnomaliesUseCase', () => {
       updateEmbeddings: mock(() => Promise.resolve()),
       findRecentWithEmbedding: mock(() => Promise.resolve([])),
       semanticSearch: mock(() => Promise.resolve([])),
+      updateScores: mock(() => Promise.resolve()),
     }
 
     const useCase = new GetNewsAnomaliesUseCase(ruwetLogRepo, articleRepo)
@@ -67,6 +68,7 @@ describe('GetNewsAnomaliesUseCase', () => {
       updateEmbeddings: mock(() => Promise.resolve()),
       findRecentWithEmbedding: mock(() => Promise.resolve([])),
       semanticSearch: mock(() => Promise.resolve([])),
+      updateScores: mock(() => Promise.resolve()),
     }
 
     const useCase = new GetNewsAnomaliesUseCase(ruwetLogRepo, articleRepo)
@@ -89,6 +91,7 @@ describe('GetNewsAnomaliesUseCase', () => {
       updateEmbeddings: mock(() => Promise.resolve()),
       findRecentWithEmbedding: mock(() => Promise.resolve([])),
       semanticSearch: mock(() => Promise.resolve([])),
+      updateScores: mock(() => Promise.resolve()),
     }
 
     const useCase = new GetNewsAnomaliesUseCase(ruwetLogRepo, articleRepo)

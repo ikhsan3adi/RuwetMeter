@@ -1,6 +1,7 @@
 # RuwetMeter — Agent Guide
 
 ## Goal
+
 Build and run RuwetMeter, a public sentiment analysis system for Indonesia, across 5 phases. Currently **all phases complete** — backend, frontend, testing, critical fixes applied.
 
 ## Commands
@@ -41,25 +42,26 @@ domain/ → application/ → infrastructure/  (one-way)
 
 ### Key decisions
 
-| Aspect             | Choice                                    |
-| ------------------ | ----------------------------------------- |
-| Frontend scope     | SPA Dashboard + Chat                      |
-| LLM Architecture   | Provider Factory (Strategy Pattern)       |
-| LLM abstraction    | MCP as primary                            |
-| Content extraction | Full article scraping via Readability     |
-| Embedding          | Agnostic (via EmbeddingProviderPort)      |
-| Request validation | Zod middleware (`@hono/zod-validator`)    |
-| Testing DB         | Testcontainers (Docker always available)  |
-| Runtime            | Bun 1.3.3 + Hono 4.12                    |
-| ORM                | Drizzle 0.40 + PostgreSQL + pgvector      |
-| Frontend framework | SvelteKit + Tailwind v4 + daisyUI v5     |
-| Fonts              | Playfair Display (heading), Plus Jakarta Sans (body) |
-| Language           | Indonesian for UI/LLM, English for code   |
+| Aspect             | Choice                                                     |
+| ------------------ | ---------------------------------------------------------- |
+| Frontend scope     | SPA Dashboard + Chat                                       |
+| LLM Architecture   | Provider Factory (Strategy Pattern)                        |
+| LLM abstraction    | MCP as primary                                             |
+| Content extraction | Full article scraping via Readability                      |
+| Embedding          | Agnostic (via EmbeddingProviderPort)                       |
+| Request validation | Zod middleware (`@hono/zod-validator`)                     |
+| Testing DB         | Testcontainers (Docker always available)                   |
+| Runtime            | Bun 1.3.3 + Hono 4.12                                      |
+| ORM                | Drizzle 0.40 + PostgreSQL + pgvector                       |
+| Frontend framework | SvelteKit + Tailwind v4 + daisyUI v5                       |
+| Fonts              | Playfair Display (heading), Plus Jakarta Sans (body)       |
+| Language           | Indonesian for UI/LLM, English for code                    |
 | Code style         | Prettier: no semi, single quote, trailing comma, 100 width |
 
 ## Progress
 
 ### Done
+
 - **Fase 1–5 complete:** full project scaffold, Clean Architecture, all layers, frontend SPA, testing.
 - **4 critical fixes:** transaction leak (removed fake BEGIN/COMMIT), DOMParser crash (fast-xml-parser), LLM hallucination (clamp), embedding rate limit (chunked batches).
 - **PostgreSQL:** vector(N) parameterization, history endpoint (inArray), pgvector auto-enable (init.sql), HNSW index.
@@ -74,8 +76,13 @@ domain/ → application/ → infrastructure/  (one-way)
 - **Chart:** Label format `dd Mon HH:00` (data updates every 3h).
 - **Typecheck:** `bun run check` = 0 errors (frontend).
 - **Git:** 3 commits.
+- **RMS (Root Mean Square) for Total Score:** Replaced simple average calculation to prevent score dilution.
+- **Per-dimension Time-Weighted RAG Decay:** Dynamic decay half-life query in DB (`CASE WHEN score > 50 THEN 3/2 days ELSE default`) utilizing cleaner options object structure in use-case and repository.
+- **DB Schema:** Updated `news_articles` to store `score_economy`, `score_politics`, `score_infrastructure`, and `score_social` (migration `0003_melted_polaris` applied).
+- **LLM Adapters:** Updated working adapters (`OpenAIAnalysisAdapter`, `GoogleAnalysisAdapter`, `AnthropicAnalysisAdapter`) to prompt and parse individual `articleScores` for database persistence.
 
 ### Blocked
+
 - OpenRouter 402 error (insufficient credits for full article payload). Workaround: OpenCode Zen for analysis.
 - DeepSeek, Mistral, Groq adapters throw "not implemented".
 - 2 repository integration tests (testcontainers) fail — container startup timeout.
@@ -118,11 +125,11 @@ See `.env.example`. All required unless a default exists:
 
 - All code in English, UI/LLM text in Indonesian
 - `ScoreDimension` constructor: validates integer 0–100, throws if invalid
-- Total score = average of 4 dimensions; flagged if delta > 30 from previous cycle
+- Total score = Root Mean Square (RMS) of 4 dimensions; flagged if delta > 30 from previous cycle
 - LLM adapters implement AnalysisProviderPort, ChatProviderPort, EmbeddingProviderPort
 - Chat single-turn; session_id accepted but not processed yet
 - Telegram webhook validates X-Telegram-Bot-Api-Secret-Token header
 - Rate limiter in-memory (Map), not shared across instances
 - Data retention: news_articles > 90 days deleted (scheduled job not implemented yet)
-- Time-weighted RAG: cosine similarity × exponential decay (half-life 24h), in SQL
+- Time-weighted RAG: cosine similarity × exponential decay with dynamic per-dimension half-life (politics: 3 days if > 50, others: 2 days if > 50, fallback to default), in SQL via `semanticSearch`
 - Don't write too many comments

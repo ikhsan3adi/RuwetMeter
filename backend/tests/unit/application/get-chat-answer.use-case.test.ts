@@ -39,6 +39,7 @@ describe('GetChatAnswerUseCase', () => {
       upsertBatch: mock(() => Promise.resolve([])),
       updateEmbeddings: mock(() => Promise.resolve()),
       findRecentWithEmbedding: mock(() => Promise.resolve([])),
+      updateScores: mock(() => Promise.resolve()),
     }
 
     const embeddingProvider: EmbeddingProviderPort = {
