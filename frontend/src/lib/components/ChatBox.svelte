@@ -5,6 +5,7 @@
   import Bot from 'lucide-svelte/icons/bot'
   import User from 'lucide-svelte/icons/user'
   import Send from 'lucide-svelte/icons/send'
+  import { marked } from 'marked'
 
   interface Message {
     role: 'user' | 'assistant'
@@ -15,6 +16,10 @@
   let input: string = $state('')
   let loading = $state(false)
   let chatContainer: HTMLDivElement
+
+  function renderMarkdown(text: string): string {
+    return marked.parse(text, { async: false }) as string
+  }
 
   async function send() {
     const text = input.trim()
@@ -74,8 +79,8 @@
             <div class="size-7 rounded-full bg-base-content/8 flex items-center justify-center shrink-0 mt-1">
               <Bot class="size-3.5 text-base-content/50" />
             </div>
-            <div class="rounded-2xl rounded-tl-sm bg-base-200 px-4 py-2.5 text-sm leading-relaxed font-body text-base-content">
-              <p class="whitespace-pre-wrap">{msg.text}</p>
+            <div class="rounded-2xl rounded-tl-sm bg-base-200 px-4 py-2.5 text-sm leading-relaxed font-body text-base-content markdown-body">
+              {@html renderMarkdown(msg.text)}
             </div>
           </div>
         {:else}
@@ -130,3 +135,51 @@
     </div>
   </div>
 </div>
+
+<style>
+  :global(.markdown-body p) {
+    margin-bottom: 0.5rem;
+  }
+  :global(.markdown-body p:last-child) {
+    margin-bottom: 0;
+  }
+  :global(.markdown-body ul) {
+    list-style-type: disc;
+    margin-left: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  :global(.markdown-body ol) {
+    list-style-type: decimal;
+    margin-left: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  :global(.markdown-body li) {
+    margin-bottom: 0.25rem;
+  }
+  :global(.markdown-body strong) {
+    font-weight: 700;
+  }
+  :global(.markdown-body code) {
+    font-family: monospace;
+    background-color: rgba(0, 0, 0, 0.06);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+  }
+  :global(.markdown-body pre) {
+    background-color: rgba(0, 0, 0, 0.06);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin-bottom: 0.5rem;
+  }
+  :global(.markdown-body pre code) {
+    background-color: transparent;
+    padding: 0;
+    font-size: 0.8125rem;
+  }
+  :global(.dark .markdown-body code),
+  :global(.dark .markdown-body pre) {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+</style>

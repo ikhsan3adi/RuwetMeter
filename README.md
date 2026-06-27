@@ -1,4 +1,9 @@
-# RuwetMeter - National Sentiment & Anomaly Analysis System
+# RuwetMeter - Autonomous Socio-Political Turbulence Index for Indonesia
+
+<div align="center">
+    <img src="./img/dash1.png" title="dash" width="480px">
+    <img src="./img/chat.png" title="chat" width="480px">
+</div>
 
 RuwetMeter is an autonomous socio-political stability monitoring system for Indonesia. It continuously scrapes news from major Indonesian portals, analyzes sentiment using LLMs across 4 dimensions (economy, politics, infrastructure, social), and presents the results in a real-time dashboard with anomaly detection and a RAG-powered chatbot.
 
@@ -36,15 +41,15 @@ flowchart LR
 
 ### Tech Stack
 
-| Layer             | Technology                                     | Role                             |
-| ----------------- | ---------------------------------------------- | -------------------------------- |
-| **Frontend**      | Svelte + Tailwind v4 + daisyUI + lucide-svelte | SPA Dashboard & Chat             |
-| **Visualization** | Chart.js                                       | Time-series line charts          |
-| **Backend API**   | Bun + Hono                                     | REST API, webhook, cron          |
-| **Database**      | PostgreSQL + pgvector                          | Metrics, articles, vector search |
-| **ORM**           | Drizzle ORM                                    | Type-safe SQL + migrations       |
-| **LLM**           | 7 providers via Strategy Pattern               | Sentiment analysis + chat        |
-| **MCP**           | Model Context Protocol                         | Standardized LLM tool-use        |
+| Layer             | Technology                                                                    | Role                             |
+| ----------------- | ----------------------------------------------------------------------------- | -------------------------------- |
+| **Frontend**      | - Svelte <br> - Tailwind v4 <br> - daisyUI <br> - marked <br> - lucide-svelte | SPA Dashboard & Chat             |
+| **Visualization** | Chart.js                                                                      | Time-series line charts          |
+| **Backend API**   | - Bun <br> - Hono                                                             | REST API, webhook, cron          |
+| **Database**      | PostgreSQL + pgvector                                                         | Metrics, articles, vector search |
+| **ORM**           | Drizzle ORM                                                                   | Type-safe SQL + migrations       |
+| **LLM**           | 7 providers via Strategy Pattern                                              | Sentiment analysis + chat        |
+| **MCP**           | Model Context Protocol                                                        | Standardized LLM tool-use        |
 
 ## Key Features
 
