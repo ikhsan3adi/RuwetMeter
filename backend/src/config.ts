@@ -23,6 +23,8 @@ export const config = {
   DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY ?? "",
   MISTRAL_API_KEY: process.env.MISTRAL_API_KEY ?? "",
   GROQ_API_KEY: process.env.GROQ_API_KEY ?? "",
+  OPENCODE_API_KEY: process.env.OPENCODE_API_KEY ?? "",
+  OPENCODE_BASE_URL: process.env.OPENCODE_BASE_URL ?? "https://opencode.ai/zen/v1",
 
   TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN ?? "",
   TELEGRAM_WEBHOOK_SECRET: process.env.TELEGRAM_WEBHOOK_SECRET ?? "",
@@ -48,6 +50,7 @@ const PROVIDER_KEY_MAP: Record<string, string> = {
   deepseek: "DEEPSEEK_API_KEY",
   mistral: "MISTRAL_API_KEY",
   groq: "GROQ_API_KEY",
+  opencode: "OPENCODE_API_KEY",
 };
 
 const selectedProviders = [

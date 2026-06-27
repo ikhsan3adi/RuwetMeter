@@ -1,4 +1,4 @@
-import { desc, sql } from "drizzle-orm";
+import { desc, sql, inArray } from "drizzle-orm";
 import type { RuwetScore } from "../../../domain/entities/ruwet-score";
 import { ScoreDimension } from "../../../domain/value-objects/score-dimension";
 import type { RuwetLogRepositoryPort } from "../../../application/ports/ruwet-log-repository.port";
@@ -86,7 +86,7 @@ export class RuwetLogRepository implements RuwetLogRepositoryPort {
     const junctionRows = await db
       .select()
       .from(ruwetLogArticles)
-      .where(sql`log_id = ANY(${logIds}::uuid[])`);
+      .where(inArray(ruwetLogArticles.logId, logIds));
 
     const articleMap = new Map<string, string[]>();
     for (const j of junctionRows) {

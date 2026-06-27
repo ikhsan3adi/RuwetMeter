@@ -10,6 +10,7 @@ import { OpenRouterAnalysisAdapter, OpenRouterChatAdapter, OpenRouterEmbeddingAd
 import { DeepSeekAnalysisAdapter, DeepSeekChatAdapter } from "./adapters/deepseek.adapter";
 import { MistralAnalysisAdapter, MistralChatAdapter } from "./adapters/mistral.adapter";
 import { GroqAnalysisAdapter, GroqChatAdapter } from "./adapters/groq.adapter";
+import { OpencodeAnalysisAdapter, OpencodeChatAdapter } from "./adapters/opencode.adapter";
 
 export function createAnalysisProvider(): AnalysisProviderPort {
   switch (config.ANALYSIS_PROVIDER) {
@@ -27,6 +28,8 @@ export function createAnalysisProvider(): AnalysisProviderPort {
       return new MistralAnalysisAdapter();
     case "groq":
       return new GroqAnalysisAdapter();
+    case "opencode":
+      return new OpencodeAnalysisAdapter();
     default:
       throw new Error(`Unknown analysis provider: ${config.ANALYSIS_PROVIDER}`);
   }
@@ -48,6 +51,8 @@ export function createChatProvider(): ChatProviderPort {
       return new MistralChatAdapter();
     case "groq":
       return new GroqChatAdapter();
+    case "opencode":
+      return new OpencodeChatAdapter();
     default:
       throw new Error(`Unknown chat provider: ${config.CHAT_PROVIDER}`);
   }
@@ -61,6 +66,8 @@ export function createEmbeddingProvider(): EmbeddingProviderPort {
       return new GoogleEmbeddingAdapter();
     case "openrouter":
       return new OpenRouterEmbeddingAdapter();
+    case "opencode":
+      throw new Error("OpenCode Zen does not support embeddings. Use openai, google, or openrouter for embeddings.");
     default:
       throw new Error(
         `Unknown or unsupported embedding provider: ${config.EMBEDDING_PROVIDER}. ` +
