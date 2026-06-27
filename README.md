@@ -86,13 +86,13 @@ $$
 
 Where:
 
-- $\Delta t$ is the age of the article: $\text{NOW} - \text{published\_at}$ (in seconds).
+- $\Delta t$ is the age of the article: $\text{NOW} - \text{published\\_at}$ (in seconds).
 - $\tau$ is the dynamic half-life decay parameter (in seconds) defined as:
 
 $$
 \tau = \begin{cases}
-259,200 \text{ s } (3 \text{ days}) & \text{if } \text{dimension} = \text{politics} \text{ and } \text{score\_politics} > 50 \\
-172,800 \text{ s } (2 \text{ days}) & \text{if } \text{dimension} \in \{\text{economy}, \text{infrastructure}, \text{social}\} \text{ and } \text{score\_dimension} > 50 \\
+259,200 \text{ s } (3 \text{ days}) & \text{if } \text{dimension} = \text{politics} \text{ and } \text{score\\_politics} > 50 \\
+172,800 \text{ s } (2 \text{ days}) & \text{if } \text{dimension} \in \{\text{economy}, \text{infrastructure}, \text{social}\} \text{ and } \text{score\\_dimension} > 50 \\
 86,400 \text{ s } (1 \text{ day}) & \text{otherwise (default)}
 \end{cases}
 $$
