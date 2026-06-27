@@ -36,15 +36,15 @@ flowchart LR
 
 ### Tech Stack
 
-| Layer             | Technology                       | Role                             |
-| ----------------- | -------------------------------- | -------------------------------- |
-| **Frontend**      | Svelte 5                         | SPA Dashboard & Chat             |
-| **Visualization** | Chart.js                         | Time-series line charts          |
-| **Backend API**   | Bun + Hono                       | REST API, webhook, cron          |
-| **Database**      | PostgreSQL + pgvector            | Metrics, articles, vector search |
-| **ORM**           | Drizzle ORM                      | Type-safe SQL + migrations       |
-| **LLM**           | 7 providers via Strategy Pattern | Sentiment analysis + chat        |
-| **MCP**           | Model Context Protocol           | Standardized LLM tool-use        |
+| Layer             | Technology                                     | Role                             |
+| ----------------- | ---------------------------------------------- | -------------------------------- |
+| **Frontend**      | Svelte + Tailwind v4 + daisyUI + lucide-svelte | SPA Dashboard & Chat             |
+| **Visualization** | Chart.js                                       | Time-series line charts          |
+| **Backend API**   | Bun + Hono                                     | REST API, webhook, cron          |
+| **Database**      | PostgreSQL + pgvector                          | Metrics, articles, vector search |
+| **ORM**           | Drizzle ORM                                    | Type-safe SQL + migrations       |
+| **LLM**           | 7 providers via Strategy Pattern               | Sentiment analysis + chat        |
+| **MCP**           | Model Context Protocol                         | Standardized LLM tool-use        |
 
 ## Key Features
 
@@ -58,10 +58,11 @@ flowchart LR
 
 ### Visual Dashboard
 
-- Real-time "Ruwet Level" score display with color coding
+- Real-time "Ruwet Level" score display with threshold-based red coloring (≥70)
 - 4 dimension bar charts (Economy, Politics, Infrastructure, Social)
-- Historical trend line chart (3/7/14/30 day selectors)
+- Historical trend line chart with 3-hour granularity (3/7/14/30 day selectors)
 - Automated anomaly flagging (delta > 30 from previous cycle)
+- Desktop background: Indonesia map SVG via `IndonesiaMap.svelte`
 
 ### RAG Chatbot
 

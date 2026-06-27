@@ -1,22 +1,60 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@import "tailwindcss";
+@import "@fontsource/plus-jakarta-sans/latin.css";
+@import "@fontsource/playfair-display/latin.css";
+
+@theme {
+  --font-heading: "Playfair Display", serif;
+  --font-body: "Plus Jakarta Sans", sans-serif;
 }
 
-html,
+@plugin "daisyui" {
+  themes: light, dark;
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #f8fafc;
-  color: #1e293b;
-  height: 100%;
+  font-family: var(--font-body);
 }
 
-a {
-  color: #3b82f6;
-  text-decoration: none;
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-a:hover {
-  text-decoration: underline;
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.35s ease-out both;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.45s ease-out both;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.dark .glass,
+[data-theme="dark"] .glass {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.glass-strong {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.dark .glass-strong,
+[data-theme="dark"] .glass-strong {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.gradient-subtle {
+  background: linear-gradient(180deg, oklch(var(--b1)) 0%, oklch(var(--b2)) 100%);
 }
