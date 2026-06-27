@@ -37,7 +37,6 @@ domain/ → application/ → infrastructure/  (one-way)
 ### LLM integration
 
 - **Provider-agnostic Strategy Pattern** via Provider Factory (Anthropic, OpenAI, Google, OpenRouter, OpenCode Zen, DeepSeek, Mistral, Groq).
-- MCP as the primary LLM abstraction for tool-use
 - Embedding dimension fixed at 1536 (OpenAI `text-embedding-3-small` schema)
 
 ### Key decisions
@@ -46,7 +45,6 @@ domain/ → application/ → infrastructure/  (one-way)
 | ------------------ | ---------------------------------------------------------- |
 | Frontend scope     | SPA Dashboard + Chat                                       |
 | LLM Architecture   | Provider Factory (Strategy Pattern)                        |
-| LLM abstraction    | MCP as primary                                             |
 | Content extraction | Full article scraping via Readability                      |
 | Embedding          | Agnostic (via EmbeddingProviderPort)                       |
 | Request validation | Zod middleware (`@hono/zod-validator`)                     |

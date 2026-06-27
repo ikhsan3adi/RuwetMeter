@@ -49,7 +49,6 @@ flowchart LR
 | **Database**      | PostgreSQL + pgvector                                                         | Metrics, articles, vector search |
 | **ORM**           | Drizzle ORM                                                                   | Type-safe SQL + migrations       |
 | **LLM**           | 7 providers via Strategy Pattern                                              | Sentiment analysis + chat        |
-| **MCP**           | Model Context Protocol                                                        | Standardized LLM tool-use        |
 
 ## Key Features
 
