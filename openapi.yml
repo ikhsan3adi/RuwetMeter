@@ -1,0 +1,168 @@
+openapi: 3.0.3
+info:
+  title: RuwetMeter API
+  version: 1.0.0
+  description: REST API backend for RuwetMeter public sentiment analytics system
+servers:
+  - url: /api/v1
+    description: Local / Production Server (v1)
+paths:
+  /metrics/current:
+    get:
+      summary: Get latest Ruwet aggregation results
+      responses:
+        '200':
+          description: Metrics data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsCurrentResponse'
+  /metrics/history:
+    get:
+      summary: Get historical time-series data for Chart.js
+      parameters:
+        - in: query
+          name: days
+          schema:
+            type: integer
+            default: 7
+          description: Number of days of history to retrieve
+      responses:
+        '200':
+          description: Time-series data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsHistoryResponse'
+  /news/anomalies:
+    get:
+      summary: Get list of top news driving high anomaly metrics
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewsListResponse'
+  /chat:
+    post:
+      summary: Interact with the time-weighted RAG chatbot
+      description: Rate-limited endpoint. Max 10 requests per minute per IP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+              properties:
+                message:
+                  type: string
+                  description: User's question
+                session_id:
+                  type: string
+                  description: (Optional) Used to continue session context (multi-turn chat)
+      responses:
+        '200':
+          description: LLM response created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '429':
+          description: Too Many Requests (Rate limit exceeded)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /webhook/telegram:
+    post:
+      summary: Receive payload from Telegram bot
+      security:
+        - TelegramBotToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Standard payload structure from Telegram API
+      responses:
+        '200':
+          description: Payload processed successfully
+        '401':
+          description: Unauthorized (Invalid Token Header)
+
+components:
+  securitySchemes:
+    TelegramBotToken:
+      type: apiKey
+      in: header
+      name: X-Telegram-Bot-Api-Secret-Token
+  schemas:
+    MetricsCurrentResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        scores:
+          type: object
+          properties:
+            economy:
+              type: integer
+            politics:
+              type: integer
+            infrastructure:
+              type: integer
+            social:
+              type: integer
+        total:
+          type: integer
+        summary:
+          type: string
+    MetricsHistoryResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/MetricsCurrentResponse'
+    NewsListResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: string
+            format: uuid
+          title:
+            type: string
+          url:
+            type: string
+          source:
+            type: string
+          published_at:
+            type: string
+            format: date-time
+    ChatResponse:
+      type: object
+      properties:
+        reply:
+          type: string
+          description: LLM narrative response
+        sources:
+          type: array
+          description: List of RAG reference URLs used as context
+          items:
+            type: string
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: RATE_LIMITED
+            message:
+              type: string
+              example: Too many requests. Try again in 60 seconds.
