@@ -1,4 +1,16 @@
 services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - '3000:3000'
+    env_file:
+      - ./backend/.env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: sh -c "bun run db:migrate && bun run src/index.ts"
+
   db:
     image: pgvector/pgvector:pg16
     environment:
