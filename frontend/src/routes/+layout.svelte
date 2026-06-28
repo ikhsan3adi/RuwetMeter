@@ -26,7 +26,7 @@
 </script>
 
 <IndonesiaMap
-  class="hidden md:block fixed inset-0 w-full h-screen pointer-events-none select-none z-0"
+  class="fixed inset-0 w-full h-screen pointer-events-none select-none z-0"
   color={theme === 'light' ? 'rgba(0,0,0,0.14)' : 'rgba(255,255,255,0.05)'}
   secondaryColor={theme === 'light' ? 'rgba(0,0,0,0.09)' : 'rgba(255,255,255,0.1)'}
 />
