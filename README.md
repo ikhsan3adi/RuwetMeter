@@ -116,9 +116,10 @@ This prevents critical socio-political events from expiring too quickly from the
 
 ### Prerequisites
 
-- [Bun](https://bun.sh) 1.3+
-- [Docker](https://docker.com) + Docker Compose
-- An LLM API key (OpenRouter, OpenCode Zen, or any supported provider)
+- [Bun](https://bun.sh) or [Node.js](https://nodejs.org)
+- PostgreSQL with pgvector extension
+- (Optional) [Docker](https://docker.com) + Docker Compose
+- An LLM API key (Anthropic, OpenAI, Google, OpenRouter, DeepSeek, Mistral, Groq or OpenCode Zen)
 
 ### 1. Start Database
 
