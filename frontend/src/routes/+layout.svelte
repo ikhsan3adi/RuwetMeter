@@ -4,6 +4,7 @@
   import Moon from 'lucide-svelte/icons/moon'
   import Sun from 'lucide-svelte/icons/sun'
   import { onMount } from 'svelte'
+  import { page } from '$app/stores'
   import '../app.css'
 
   let { children } = $props()
@@ -57,11 +58,13 @@
     {@render children()}
   </main>
 
-  <a
-    href="/chat"
-    class="btn btn-circle fixed bottom-6 right-6 z-40 size-14 transition-transform duration-300 hover:scale-110 active:scale-95 bg-base-content/10 hover:bg-base-content/15 text-base-content/60 hover:text-base-content border-none"
-    aria-label="Chat"
-  >
-    <MessageCircle class="size-6" />
-  </a>
+  {#if $page.url.pathname !== '/chat'}
+    <a
+      href="/chat"
+      class="btn btn-circle fixed bottom-6 right-6 z-40 size-14 transition-transform duration-300 hover:scale-110 active:scale-95 bg-base-content/10 hover:bg-base-content/15 text-base-content/60 hover:text-base-content border-none"
+      aria-label="Chat"
+    >
+      <MessageCircle class="size-6" />
+    </a>
+  {/if}
 </div>
