@@ -4,7 +4,7 @@ import * as schema from './schema'
 import { config } from '../../config'
 
 const pool = new pg.Pool({
-  connectionString: config.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL || config.DATABASE_URL,
   max: 10,
 })
 

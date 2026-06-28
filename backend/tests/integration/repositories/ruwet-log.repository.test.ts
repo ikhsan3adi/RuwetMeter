@@ -1,26 +1,15 @@
 import { describe, test, expect, beforeAll, afterAll } from 'bun:test'
-import { RuwetLogRepository } from '../../../src/infrastructure/database/repositories/ruwet-log.repository'
 import { ScoreDimension } from '../../../src/domain/value-objects/score-dimension'
+import { RuwetLogRepository } from '../../../src/infrastructure/database/repositories/ruwet-log.repository'
 import { ArticleRepository } from '../../../src/infrastructure/database/repositories/article.repository'
-import { startTestDb, stopTestDb, applySchema } from '../setup'
-import type { drizzle } from 'drizzle-orm/node-postgres'
-import type pg from 'pg'
 
 describe('RuwetLogRepository (integration)', () => {
-  let pool: pg.Pool | null = null
   let repo: RuwetLogRepository
   let articleRepo: ArticleRepository
 
-  beforeAll(async () => {
-    const setup = await startTestDb()
-    pool = setup.pool
-    await applySchema(pool)
+  beforeAll(() => {
     repo = new RuwetLogRepository()
     articleRepo = new ArticleRepository()
-  }, 120000)
-
-  afterAll(async () => {
-    await stopTestDb()
   })
 
   test('save creates a log entry with article relations', async () => {

@@ -1,24 +1,12 @@
 import { describe, test, expect, beforeAll, afterAll } from 'bun:test'
 import { ArticleRepository } from '../../../src/infrastructure/database/repositories/article.repository'
-import { startTestDb, stopTestDb, applySchema } from '../setup'
-import type { drizzle } from 'drizzle-orm/node-postgres'
-import type pg from 'pg'
+import pg from 'pg'
 
 describe('ArticleRepository (integration)', () => {
-  let db: ReturnType<typeof drizzle> | null = null
-  let pool: pg.Pool | null = null
   let repo: ArticleRepository
 
-  beforeAll(async () => {
-    const setup = await startTestDb()
-    db = setup.db
-    pool = setup.pool
-    await applySchema(pool)
+  beforeAll(() => {
     repo = new ArticleRepository()
-  }, 120000)
-
-  afterAll(async () => {
-    await stopTestDb()
   })
 
   test('upsertBatch inserts new articles', async () => {
@@ -81,7 +69,7 @@ describe('ArticleRepository (integration)', () => {
       },
     ])
 
-    const embedding = new Array(4).fill(0).map(() => Math.random() * 2 - 1)
+    const embedding = new Array(1536).fill(0).map(() => Math.random() * 2 - 1)
     await repo.updateEmbeddings([{ articleId: article.id, embedding }])
 
     const recent = await repo.findRecentWithEmbedding(10)
