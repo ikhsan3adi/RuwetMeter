@@ -23,12 +23,13 @@ export interface AnomalyArticle {
   title: string
   url: string
   source: string
-  published_at: string
+  publishedAt: string
 }
 
 export interface ChatRequest {
   message: string
   session_id?: string
+  dimensionFilter?: 'economy' | 'politics' | 'infrastructure' | 'social'
 }
 
 export interface ChatResponse {

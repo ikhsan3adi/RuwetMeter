@@ -63,6 +63,10 @@ paths:
                 session_id:
                   type: string
                   description: (Optional) Used to continue session context (multi-turn chat)
+                dimensionFilter:
+                  type: string
+                  enum: [economy, politics, infrastructure, social]
+                  description: (Optional) Filter context to a specific socio-political dimension
       responses:
         '200':
           description: LLM response created successfully
@@ -140,7 +144,7 @@ components:
             type: string
           source:
             type: string
-          published_at:
+          publishedAt:
             type: string
             format: date-time
     ChatResponse:

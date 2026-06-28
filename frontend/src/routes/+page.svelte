@@ -41,6 +41,16 @@
 
   function isHigh(v: number) { return v >= 70 }
 
+  function getDimensionKey(label: string): string {
+    switch (label) {
+      case 'Ekonomi': return 'economy'
+      case 'Politik': return 'politics'
+      case 'Infrastruktur': return 'infrastructure'
+      case 'Sosial': return 'social'
+      default: return ''
+    }
+  }
+
   const scoreBars = $derived(getScoreBars(current))
 </script>
 
@@ -60,13 +70,17 @@
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 animate-slide-up" style="animation-delay: 0.08s">
       {#each scoreBars as bar}
-        <div class="glass rounded-2xl border border-base-content/10 p-5 text-center">
+        <a
+          href="/chat?dimension={getDimensionKey(bar.label)}"
+          class="glass rounded-2xl border border-base-content/10 p-5 text-center block hover:bg-base-content/5 transition-colors cursor-pointer group"
+        >
           <p class="text-xs font-semibold text-base-content/70 font-heading uppercase tracking-wider mb-2">{bar.label}</p>
           <p class="text-2xl md:text-3xl font-bold font-body {isHigh(bar.value) ? 'text-red-500/80' : 'text-base-content'}">{bar.value}</p>
           <div class="mt-3 h-2 rounded-full bg-base-content/8 overflow-hidden">
             <div class="h-full rounded-full {isHigh(bar.value) ? 'bg-red-500/40' : 'bg-base-content/20'} transition-all duration-700 ease-out" style="width: {bar.value}%"></div>
           </div>
-        </div>
+          <span class="text-[10px] text-base-content/30 group-hover:text-base-content/70 transition-colors mt-3 block font-body font-medium">Tanya AI tentang {bar.label} &rarr;</span>
+        </a>
       {/each}
     </div>
 

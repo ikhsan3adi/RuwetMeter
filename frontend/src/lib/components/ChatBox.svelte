@@ -5,17 +5,29 @@
   import Bot from 'lucide-svelte/icons/bot'
   import User from 'lucide-svelte/icons/user'
   import Send from 'lucide-svelte/icons/send'
+  import Link from 'lucide-svelte/icons/link'
   import { marked } from 'marked'
+  import { onMount } from 'svelte'
 
   interface Message {
     role: 'user' | 'assistant'
     text: string
+    sources?: string[]
   }
 
   let messages: Message[] = $state([])
   let input: string = $state('')
   let loading = $state(false)
   let chatContainer: HTMLDivElement
+  let dimensionFilter: 'economy' | 'politics' | 'infrastructure' | 'social' | undefined = $state(undefined)
+
+  onMount(() => {
+    const params = new URLSearchParams(window.location.search)
+    const dim = params.get('dimension')
+    if (dim && ['economy', 'politics', 'infrastructure', 'social'].includes(dim)) {
+      dimensionFilter = dim as any
+    }
+  })
 
   function renderMarkdown(text: string): string {
     return marked.parse(text, { async: false }) as string
@@ -30,8 +42,11 @@
     loading = true
 
     try {
-      const res: ChatResponse = await sendChatMessage({ message: text })
-      messages.push({ role: 'assistant', text: res.reply })
+      const res: ChatResponse = await sendChatMessage({
+        message: text,
+        dimensionFilter: dimensionFilter || undefined,
+      })
+      messages.push({ role: 'assistant', text: res.reply, sources: res.sources })
     } catch (err) {
       messages.push({
         role: 'assistant',
@@ -79,8 +94,21 @@
             <div class="size-7 rounded-full bg-base-content/8 flex items-center justify-center shrink-0 mt-1">
               <Bot class="size-3.5 text-base-content/50" />
             </div>
-            <div class="rounded-2xl rounded-tl-sm bg-base-200 px-4 py-2.5 text-sm leading-relaxed font-body text-base-content markdown-body">
+            <div class="rounded-2xl rounded-tl-sm bg-base-200 px-4 py-2.5 text-sm leading-relaxed font-body text-base-content markdown-body w-full">
               {@html renderMarkdown(msg.text)}
+              {#if msg.sources && msg.sources.length > 0}
+                <div class="mt-3 pt-2.5 border-t border-base-content/10 text-xs text-base-content/60 space-y-1 font-body">
+                  <span class="font-semibold block text-base-content/70">Referensi Artikel:</span>
+                  <div class="flex flex-col gap-1">
+                    {#each msg.sources as src}
+                      <a href={src} target="_blank" rel="noopener noreferrer" class="link hover:text-red-500/80 transition-colors flex items-center gap-1.5 truncate">
+                        <Link class="size-3 shrink-0 text-base-content/40" />
+                        <span class="truncate">{src}</span>
+                      </a>
+                    {/each}
+                  </div>
+                </div>
+              {/if}
             </div>
           </div>
         {:else}
@@ -110,6 +138,24 @@
   </div>
 
   <div class="border-t border-base-content/10 p-3 md:p-4 bg-base-100/50">
+    <div class="flex flex-wrap gap-1.5 mb-3 max-w-4xl mx-auto px-1">
+      <span class="text-xs text-base-content/40 self-center mr-1 font-heading uppercase tracking-wider font-semibold">Fokus:</span>
+      {#each [
+        { label: 'Semua', value: undefined },
+        { label: 'Ekonomi', value: 'economy' },
+        { label: 'Politik', value: 'politics' },
+        { label: 'Infrastruktur', value: 'infrastructure' },
+        { label: 'Sosial', value: 'social' }
+      ] as dim}
+        <button
+          class="btn btn-xs rounded-full px-2.5 border-none font-body transition-all {dimensionFilter === dim.value ? 'bg-base-content/20 text-base-content font-bold' : 'bg-base-content/5 text-base-content/50 hover:bg-base-content/10 hover:text-base-content/70'}"
+          onclick={() => { dimensionFilter = dim.value as any }}
+          disabled={loading}
+        >
+          {dim.label}
+        </button>
+      {/each}
+    </div>
     <div class="flex gap-2 items-end max-w-4xl mx-auto">
       <div class="flex-1 relative">
         <textarea
