@@ -23,6 +23,7 @@ import { metricsRoutes } from './routes/metrics.route'
 import { newsRoutes } from './routes/news.route'
 import { chatRoutes } from './routes/chat.route'
 import { webhookRoutes } from './routes/webhook.route'
+import { TelegramService } from '../telegram/telegram.service'
 import { errorHandler } from './middleware/error-handler'
 
 import { startAggregationCron } from '../cron/aggregation-job'
@@ -34,6 +35,7 @@ const analysisProvider = createAnalysisProvider()
 const chatProvider = createChatProvider()
 const embeddingProvider = createEmbeddingProvider()
 const rssFetcher = new RssFetcher()
+const telegramService = new TelegramService()
 
 const aggregateNewsUC = new AggregateNewsUseCase(
   rssFetcher,
@@ -54,7 +56,7 @@ app.onError(errorHandler)
 app.route('/metrics', metricsRoutes(getCurrentMetricsUC, getMetricsHistoryUC))
 app.route('/news', newsRoutes(getNewsAnomaliesUC))
 app.route('/chat', chatRoutes(getChatAnswerUC))
-app.route('/webhook', webhookRoutes(getChatAnswerUC))
+app.route('/webhook', webhookRoutes(getChatAnswerUC, telegramService))
 
 startAggregationCron(aggregateNewsUC)
 
